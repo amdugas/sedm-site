@@ -1,24 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-{% block head %}
-    {{ super() }}
-    <meta charset="UTF-8">
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="description" content="" />
-    <meta name="keywords" content="" />
-    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
-
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/sedm-main.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-{% endblock %}
-</head>
-
-<body>
-{% block body %}
+{% extends "sedm_base.html" %}
+{% block content %}
     {% if session['logged_in'] %}
         <p>You're logged in already!</p>
     {% else %}
@@ -53,5 +34,3 @@
 
     {% endif %}
 {% endblock %}
-</body>
-</html>
