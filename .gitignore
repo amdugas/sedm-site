@@ -1,5 +1,6 @@
 debug_log.txt
 *~
+*.json # I don't know the details but Richard says this shouldn't go to github
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
