@@ -1323,27 +1323,32 @@ class SedmDB:
             pardic:
                 required:
                     'object_id' (int/long)
-                    'mjd0' (float) (mjd of period 0)
                     'phasedays' (float) (period in days)
+                    one of:
+                        'mjd0' (float) (mjd of period 0)
+                        'phi' (float) (phase offset, [-0.5, 0.5))
 
         Returns:
             (-1: "ERROR...") if there is an issue
 
             (id (long), "Periodic information added") if it completes successfully
         """
-        param_types = {'id': int, 'object_id': int, 'mjd0': float, 'phasedays': float}
+        param_types = {'id': int, 'object_id': int, 'phasedays': float, 'phi': float, 'mjd0': float}
         id = _id_from_time()
         pardic['id'] = id
         # TODO: which parameters are required? test
         keys = list(pardic.keys())
 
-        for key in ['object_id', 'mjd0', 'phasedays']:
+        for key in ['object_id', 'phasedays']:
             if key not in keys:
                 return (-1, "ERROR: %s not provided!" % (key,))
+        if 'mjd0' not in keys and 'phi' not in keys:
+            return (-1, "ERROR: mjd0 or phi not provided!")
 
         for key in reversed(keys):
-            if key not in ['id', 'object_id', 'mjd0', 'phasedays']:
+            if key not in ['id', 'object_id', 'phasedays', 'phi', 'mjd0']:
                 return (-1, "ERROR: %s is an invalid key!" % (key,))
+        
         type_check = _data_type_check(keys, pardic, param_types)
         if type_check:
             return (-1, type_check)
