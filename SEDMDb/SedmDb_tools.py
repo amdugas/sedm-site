@@ -126,7 +126,7 @@ class DbTools(object):
         # TODO: return to SedmDb.py because of how much sql "understanding" it requires?
         # TODO: evaluate assumption that the most recent change to the request will be setting 'status' to 'COMPLETED'
         where_dict = {'program_id': program_id, 'lastmodified': '>' + start_date, 'lastmodified': '<' + end_date}
-        sql = ("SELECT exptime, nexposures, phasesamples FROM request WHERE program_id='%s', status='COMPLETED', "
+        sql = ("SELECT exptime, nexposures, phase FROM request WHERE program_id='%s', status='COMPLETED', "
                "lastmodified>'%s', lastmodified<'%s';" % (program_id, start_date, end_date))
         # TODO: fix this, it's really bad that it doesn't go through the checks of SedmDb functions
         # TODO: allow where_dict values to be lists (if it is a list iterate through)?
@@ -167,14 +167,14 @@ class DbTools(object):
         return user_requests
 
     def get_active_requests(self, values=['id', 'object_id', 'user_id', 'program_id', 'marshal_id', 'exptime',
-                            'maxairmass', 'priority', 'cadence', 'phasesamples', 'sampletolerance',
+                            'maxairmass', 'priority', 'cadence', 'phase', 'sampletolerance',
                             'filters', 'nexposures', 'ordering']):
         """
         Get the parameters for all 'ACTIVE' requests
         Args:
             values (list): the values to get for each request
                 defaults to ['id', 'object_id', 'user_id', 'program_id', 'marshal_id', 'exptime',
-                             'maxairmass', 'priority', 'cadence', 'phasesamples', 'sampletolerance',
+                             'maxairmass', 'priority', 'cadence', 'phase', 'sampletolerance',
                              'filters', 'nexposures', 'ordering']
         Returns:
             list of tuples conaining the ``values`` for each active request
@@ -242,9 +242,9 @@ class DbTools(object):
 
         if self.db.execute_sql("SELECT id FROM atomicrequest WHERE request_id='%s';" % (request_id,)):
             return (-1, "ERROR: atomicrequests already exist for that request!")
-        request = self.db.get_from_request(['object_id', 'exptime', 'priority', 'inidate', 'enddate', 'cadence', 'phasesamples',
+        request = self.db.get_from_request(['object_id', 'exptime', 'priority', 'inidate', 'enddate', 'cadence', 'phase',
                                         'sampletolerance', 'filters', 'nexposures', 'ordering'], {'id': request_id})[0]
-        # TODO: implement cadence/phasesamples/sampletolerance (I have no idea how they interact with nexposures)
+        # TODO: implement cadence/sampletolerance (I have no idea how they interact with nexposures)
         pardic = {'object_id': int(request[0]), 'priority': float(request[2]), 'inidate': str(request[3]),
                   'enddate': str(request[4]), 'request_id': int(request_id)}
         obs_order = []
