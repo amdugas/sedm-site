@@ -96,7 +96,7 @@ class AddFixedRequest(FlaskForm):
                                         validators=(validators.Optional(),
                                                     validators.number_range(0., 10.)),
                                         default=10)
-    phasesamples = fields.FloatField('samples per period', default=None)
+    phase = fields.FloatField('Phase in period (0 to 1)', default=None)
     sampletolerance = fields.FloatField('samples tolerance', default=None)
     inidate = fields.DateField('start date (Y-m-d)',
                                validators=[validators.input_required()],

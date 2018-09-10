@@ -26,7 +26,7 @@ request_values = ['id', 'object_id', 'marshal_id',
                   'user_id', 'allocation_id',
                   'exptime', 'priority', 'inidate',
                   'enddate', 'maxairmass',
-                  'cadence', 'phasesamples',
+                  'cadence', 'phase',
                   'sampletolerance', 'filters',
                   'nexposures', 'obs_seq', 'status',
                   'creationdate', 'lastmodified',
@@ -319,8 +319,8 @@ def populate_form(content, form):
         form.maxairmass.data = ret_dict['maxairmass']
     if 'cadence' in ret_dict:
         form.cadence.data = ret_dict['cadence']
-    if 'phasesamples' in ret_dict:
-        form.phasesamples.data = ret_dict['phasesamples']
+    if 'phase' in ret_dict:
+        form.phase.data = ret_dict['phase']
     if 'sampletolerance' in ret_dict:
         form.sampletolerance.data = ret_dict['sampletolerance']
     if 'status_id' in ret_dict:

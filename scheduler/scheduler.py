@@ -43,7 +43,7 @@ class ScheduleNight:
                                     r.max_fwhm, r.min_moon_dist, r.max_moon_illum, 
                                     r.max_cloud_cover, r.status, 
                                     r.priority AS reqpriority, r.inidate, r.enddate,
-                                    r.cadence, r.phasesamples, r.sampletolerance, 
+                                    r.cadence, r.phase, r.sampletolerance, 
                                     r.filters, r.nexposures, r.obs_seq, r.seq_repeats,
                                     r.seq_completed, r.last_obs_jd, r.creationdate,
                                     r.lastmodified, r.allocation_id, r.marshal_id, 

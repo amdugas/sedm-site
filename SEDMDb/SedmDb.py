@@ -1428,7 +1428,7 @@ class SedmDB:
                     'marshal_id' (int/long),
                     'maxairmass' (float) (max allowable airmass for observation, default 2.5),
                     'cadence' (float) (time between periods),
-                    'phasesamples' (float) (how many samples in a period),
+                    'phase' (float, 0 <= phase < 1) (when it needs to be observed in period),
                     'sampletolerance' (float) (how much tolerance in when the samples can be taken),
                     'nexposures' (str '{# of ifu, # of u, # of g, # of r, # of i}'),
                     'obs_seq' (str e.g. '{3g, 3r, 1i, 1ifu, 2i}' for 3 of g, then 3 of r, then 1 i, 1 ifu, 1 i),
@@ -1446,10 +1446,10 @@ class SedmDB:
 
             (id (long), "Request added") if there are no errors
         """
-        # TODO: get a better description of cadence/phasesamples/sampletolerance
+        # TODO: get a better description of cadence/sampletolerance
         param_types = {'id': int, 'object_id': int, 'user_id': int, 'allocation_id': int, 'exptime': str, 'priority': float,
                        'inidate': 'date', 'enddate': 'date', 'marshal_id': int, 'maxairmass': float, 'cadence': float,
-                       'phasesamples': float, 'sampletolerance': float, 'nexposures': str, 'obs_seq': str,
+                       'phase': float, 'sampletolerance': float, 'nexposures': str, 'obs_seq': str,
                        'max_fwhm': float, 'min_moon_dist': float, 'max_moon_illum': float, 'max_cloud_cover': float,
                        'seq_repeats': int, 'seq_completed': int, 'status': str}
         id = _id_from_time()
@@ -1500,7 +1500,7 @@ class SedmDB:
         for key in reversed(keys):  # remove any invalid keys
             if key not in ['id', 'object_id', 'user_id', 'allocation_id', 'exptime', 'priority', 'status',
                            'inidate', 'enddate', 'marshal_id', 'maxairmass', 'cadence', 'seq_completed',
-                           'phasesamples', 'sampletolerance', 'nexposures', 'obs_seq', 'seq_repeats',
+                           'phase', 'sampletolerance', 'nexposures', 'obs_seq', 'seq_repeats',
                            'max_fwhm', 'min_moon_dist', 'max_moon_illum', 'max_cloud_cover']:
                 return (-1, "ERROR: %s is an invalid key!" % (key,))
         type_check = _data_type_check(keys, pardic, param_types)
@@ -1545,7 +1545,7 @@ class SedmDB:
         """
         param_types ={'id': int, 'object_id': int, 'user_id': int, 'allocation_id': int, 'exptime': str, 'priority': float,
                        'inidate': 'date', 'enddate': 'date', 'marshal_id': int, 'maxairmass': float, 'cadence': float,
-                       'phasesamples': float, 'sampletolerance': float, 'nexposures': str, 'obs_seq': str,
+                       'phase': float, 'sampletolerance': float, 'nexposures': str, 'obs_seq': str,
                        'max_fwhm': float, 'min_moon_dist': float, 'max_moon_illum': float, 'max_cloud_cover': float,
                        'seq_repeats': int, 'seq_completed': int, 'status': str}
         keys = list(pardic.keys())
@@ -1562,7 +1562,7 @@ class SedmDB:
         for key in reversed(keys):  # remove any keys that are invalid or not allowed to be updated
             if key not in ['id', 'object_id', 'user_id', 'allocation_id', 'exptime', 'priority', 'status',
                            'inidate', 'enddate', 'marshal_id', 'maxairmass', 'cadence', 'seq_completed',
-                           'phasesamples', 'sampletolerance', 'nexposures', 'obs_seq', 'seq_repeats',
+                           'phase', 'sampletolerance', 'nexposures', 'obs_seq', 'seq_repeats',
                            'max_fwhm', 'min_moon_dist', 'max_moon_illum', 'max_cloud_cover']:
                 return (-1, "ERROR: %s is an invalid key!" % (key,))
         if len(keys) == 0:
@@ -1605,7 +1605,7 @@ class SedmDB:
                 'marshal_id' (int/long),
                 'maxairmass' (float),
                 'cadence' (float),
-                'phasesamples' (float),
+                'phase' (float),
                 'sampletolerance' (float),
                 'filters' (str),
                 'nexposures' (str),
@@ -1630,7 +1630,7 @@ class SedmDB:
         """
         allowed_params = {'id': int, 'object_id': int, 'user_id': int, 'allocation_id': int, 'exptime': str, 'status': str,
                           'priority': float, 'inidate': 'date', 'enddate': 'date', 'marshal_id': int,
-                          'maxairmass': float, 'cadence': float, 'phasesamples': float, 'sampletolerance': float,
+                          'maxairmass': float, 'cadence': float, 'phase': float, 'sampletolerance': float,
                           'filters': str, 'nexposures': str, 'obs_seq': str, 'creationdate': 'date',
                           'lastmodified': 'date', 'seq_repeats': int, 'seq_completed': int, 'last_obs_jd': float,
                           'max_fwhm': float, 'min_moon_dist': float, 'max_moon_illum': float, 'max_cloud_cover': float}
