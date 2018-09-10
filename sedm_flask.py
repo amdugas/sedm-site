@@ -4,6 +4,7 @@ from forms import *
 import json
 import os
 import model
+import flask
 
 from bokeh.resources import INLINE
 
@@ -232,6 +233,142 @@ def logout():
     flask_login.logout_user()
     return redirect(url_for('login'))
 
+
+@app.route('/manage_user', methods=['GET', 'POST'])
+@flask_login.login_required
+def manage_user():
+
+    if flask_login.current_user.name != 'SEDM_admin':
+        return redirect(flask.url_for('index'))
+
+    message = ""
+    form1 = SearchUserForm()
+    form2 = UsersForm()
+
+    old_groups = []
+    new_groups = []
+    allocations =[]
+
+    #Case with no user at all
+    if len(flask.request.args) ==0:
+        message = "Introduce the search criteria for your user. For exact search try \"."
+
+
+        return (render_template('manage_users.html', form1=form1, from2=form2, message=message))
+
+    #Case with when we want to search for a specific user
+    if 'search_user' in flask.request.form:
+        username = form1.search_string.data
+    elif('user' in flask.request.args):    
+        username = flask.request.args['user']
+    elif (form2.username.data):
+        username = form2.username.data
+        #username.replace("'", "").replace('"', '')
+        #username = '"{0}"'.format(username)
+    else:
+        username = ''
+
+    u = model.get_info_user(username)
+    message = u["message"]
+
+
+    if username =="" or not "username" in u.keys():
+
+        form2.old_groups.choices = []
+        form2.new_groups.choices = []
+
+        if 'add_user' in flask.request.form:
+
+            name = form2.name.data
+            email = form2.email.data
+            new_password = form2.pass_new.data
+            new_password_conf = form2.pass_conf.data
+
+
+            if form2.pass_new.data and new_password ==new_password_conf:
+                status, mes = db.add_user({"username":username, "name":name, "email":email, "password":new_password})
+                if status ==0:
+                    flash("User created")
+                else:
+                    message = mes
+            else:
+                message = "New user requires a password!"
+
+            return (render_template('manage_users.html', form1=form1, form2=form2, allocations=[], message=message))
+
+        else:
+            return (render_template('manage_users.html', form1=form1, form2=form2, allocations=[], message=message))
+    else:
+        form2.old_groups.choices = [(g[0], g[0]) for g in u["old_groups"]]
+        form2.new_groups.choices = [(g[0], g[0]) for g in u["new_groups"]]
+        allocations = u["allocations"]
+
+
+    if 'search_user' in flask.request.form and form1.validate_on_submit():
+        form2.username.data = u["username"]
+        form2.name.data = u["name"]
+        form2.email.data = u["email"]
+
+    elif 'add_group' in flask.request.form :
+        username = form2.username.data
+        #username.replace("'", "").replace('"', '')
+        #u = model.get_info_user(username)#'"{0}"'.format(username))
+        u = model.get_info_user('"{0}"'.format(username))
+        message = u["message"]
+
+        g = flask.request.form['new_groups']
+        model.add_group(u["id"], g)
+        message = "Added group for user %s"%(form2.username.data)
+
+    elif 'remove_group' in flask.request.form:
+
+        username = form2.username.data
+        #username.replace("'", "").replace('"', '')
+        #u = model.get_info_user(username)#'"{0}"'.format(username))
+        u = model.get_info_user('"{0}"'.format(username))
+        message = u["message"]
+        g = flask.request.form['old_groups']
+        model.remove_group(u["id"], g)
+        message = "Deleted group for user %s"%form2.username.data
+
+    elif 'modify_user' in flask.request.form and form2.validate_on_submit():
+        username = form2.username.data
+        u = model.get_info_user('"{0}"'.format(form2.username.data))
+        #u = model.get_info_user(username) #'"{0}"'.format(form2.username.data))
+        message = u["message"]
+
+        name = form2.name.data
+        email = form2.email.data
+        new_password = form2.pass_new.data
+        new_password_conf = form2.pass_conf.data
+
+        status, mes = db.update_user({'id': u["id"], 'name':name, 'email':email})  
+        flash("User with username %s updated with name %s, email %s. %s"%(username, name, email, mes))   
+
+        #If there is any infoirmation in the password field, we update
+        if form2.pass_new.data:
+            db.update_user({'id': u["id"], 'password': new_password})
+            flash("Password changed ")
+    elif 'delete_user' in flask.request.form and form2.name.data:
+
+        username = form2.username.data
+        u = model.get_info_user(username)
+
+        if 'username' in u.keys():
+            status, mes = db.remove_user({'id': u["id"]})  
+            flash("Deleted user with username %s. %s"%(username, mes))   
+            return (render_template('manage_users.html', form1=form1, form2=None, allocations=[], message=message))
+
+    else:
+        print ("NOTHING TO BE DONE")
+        pass
+
+    u = model.get_info_user(username)
+    form2.old_groups.choices = [(g[0], g[0]) for g in u["old_groups"]]
+    form2.new_groups.choices = [(g[0], g[0]) for g in u["new_groups"]]
+    allocations = u["allocations"]
+
+    return (render_template('manage_users.html', form1=form1, form2=form2, allocations=allocations, message=message) )
 
 if __name__ == '__main__':
     app.run()

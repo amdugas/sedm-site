@@ -1540,6 +1540,93 @@ def get_p18obsdata(obsdate):
 
     return p18date, p18seeing
 
+def get_info_user(username):
+    '''
+    Returns a json dictionary with the values for the user.
+    The fields are: 
+        - message: what message we can get from the DB.
+        - username:
+        - name:
+        - email:
+        - user_id
+        - list of active allocations of the user
+        - list of current groups the user belongs to
+        - list of groups the user does not belong to
+    '''
+    if (username==""):
+        user_info = None
+    elif ('"' in username):
+        username = username.split('"')[1]
+        user_info = db.execute_sql("SELECT username, name, email, id FROM users WHERE username ='{0}'".format(username))
+    elif ("'" in username):
+        username = username.split("'")[1]
+        user_info = db.execute_sql("SELECT username, name, email, id FROM users WHERE username ='{0}'".format(username))
+    else:
+        userlower = username.lower()
+        user_info = db.execute_sql("SELECT username, name, email, id FROM users WHERE LOWER(username) LIKE '%{0}%' OR LOWER(name) LIKE '%{1}%' OR LOWER(email) LIKE '%{2}%@%'".format(userlower, userlower, userlower))
+
+    if (not user_info is None and len(user_info)==1):
+        user_info = user_info[0]
+        username = user_info[0]
+        name = user_info[1]
+        email = user_info[2]
+        user_id = user_info[3]
+
+        user_allocations = db.execute_sql("""SELECT g.designator, p.designator, a.designator, a.inidate, a.enddate  
+                                               FROM allocation a, program p, groups g, users u, usergroups ug 
+                                               WHERE ug.user_id = u.id AND ug.group_id = g.id 
+                                               AND a.program_id=p.id AND p.group_id = g.id AND a.active=TRUE 
+                                               AND u.id = %d order by g.designator; """%user_id)
+        allocations = jsonify(user_allocations, names=["group", "program", "allocation", "inidate", "enddate"])
+        old_groups = db.execute_sql("""SELECT DISTINCT g.designator 
+                                        FROM groups g, usergroups ug, users u 
+                                        WHERE ug.user_id = u.id AND ug.group_id=g.id AND ug.user_id = u.id AND u.id=%d 
+                                        ORDER BY g.designator;"""%user_id)
+        new_groups = db.execute_sql("""SELECT DISTINCT g.designator 
+                                        FROM groups g  
+                                        WHERE g.id NOT IN 
+                                            (SELECT DISTINCT group_id 
+                                             FROM usergroups ug 
+                                             WHERE  ug.user_id=%d) ORDER BY g.designator;"""%user_id)
+
+        u = { "message":"User found.", "username":username, "name":name, "email":email, "id":user_id, \
+            "allocations":allocations, "old_groups":old_groups, "new_groups":new_groups}
+    elif user_info is None or len(user_info)==0:
+        u = {"message": "Found no user with your search criteria. Try with a different name / username / email username."}
+    elif len( user_info) > 1:
+        users = [u[0] for u in user_info]
+        u = {"message": "Found %d users with same search criteria. Use \"\" for exact search. Choose one from: %s"%(len(user_info), users)}
+    else:
+        u = {"message": "Other issue when searching for the user. %d user found"%len(user_info)}
+    return u
+
+def add_group(user_id, g_descriptor):
+    '''
+    Adds the association between the user and the group in the table usergrouops.
+    '''
+
+    group_id = db.get_from_usergroups("id", {"designator":g_descriptor})
+    db.add_usergroup(user_id, group_id)
+
+
+def jsonify(dbout, names):
+    """
+    Receive a response from an SQL DB and converts it into a json file with the names provided.
+    """
+
+    if len(dbout) ==0:
+        return {}
+    elif len(dbout[0]) != len(names):
+        return {"message": "Lenght of SQL response different from length of names."}
+    else:
+        json = []
+        for o in dbout:
+            j = {}
+            for i, n in enumerate(names):
+                j[n] = o[i]
+            json.append(j)
+
+        return json
 
 if __name__ == "__main__":
     x = get_ifu_products('/scr7/rsw/sedm/redux/20180827/', 189)
