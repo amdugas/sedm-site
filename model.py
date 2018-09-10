@@ -1452,7 +1452,7 @@ def get_filter_exptime(obsfilter, mag):
         g_exptime = 120
         i_exptime = 120
         u_exptime = 300
-    elif mag < 13:
+    elif mag > 13:
         ifu_exptime = 900
         r_exptime = 90
         g_exptime = 90
