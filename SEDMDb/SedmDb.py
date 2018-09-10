@@ -1379,6 +1379,7 @@ class SedmDB:
                 'id' (int/long),
                 'object_id' (int/long)
                 'mjd0' (float)
+                'phi' (float)
                 'phasedays' (float)
 
         Returns:
@@ -1388,7 +1389,7 @@ class SedmDB:
 
             (-1, "ERROR...") if there was an issue
         """
-        allowed_params = {'object_id': int, 'mjd0': float, 'phasedays': float, 'id': int}
+        allowed_params = {'object_id': int, 'mjd0': float, 'phi': float, 'phasedays': float, 'id': int}
         sql = _generate_select_sql(values, where_dict, allowed_params, compare_dict, 'periodic')
         print(sql)
         if sql[0] == 'E':  # if the sql generation returned an error
