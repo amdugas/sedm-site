@@ -1062,10 +1062,10 @@ def get_ifu_products(obsdir, user_id, obsdate="", show_finder=True,
 
             div_str += "</div>"
 
-        sedm_dict = {'sci_data': div_str}
+        sedm_dict = {'sci_data': div_str, 'message': 'Results shown for {}'.format(obsdate)}
     return sedm_dict
 
-
+    
 ###############################################################################
 # THIS SECTION IS THE WEATHER STATS SECTION.                                  #
 # KEYWORD:WEATHER_STATS                                                       #
@@ -1440,48 +1440,49 @@ def get_filter_exptime(obsfilter, mag):
     """
 
     mag = float(mag)
-    if mag > 18:
-        ifu_exptime = 3600
-        r_exptime = 180
-        g_exptime = 180
-        i_exptime = 180
-        u_exptime = 300
-    elif mag > 15:
-        ifu_exptime = 2700
-        r_exptime = 120
-        g_exptime = 120
-        i_exptime = 120
-        u_exptime = 300
-    elif mag > 13:
-        ifu_exptime = 900
-        r_exptime = 90
-        g_exptime = 90
-        i_exptime = 90
-        u_exptime = 180
-    elif mag > 12:
-        ifu_exptime = 600
-        r_exptime = 60
-        g_exptime = 60
-        i_exptime = 60
-        u_exptime = 120
-    elif mag > 10:
-        ifu_exptime = 300
-        r_exptime = 30
-        g_exptime = 30
-        i_exptime = 30
-        u_exptime = 60
+
+    if mag > 0:
+        ifu_exptime = 60
+        r_exptime = 1
+        g_exptime = 1
+        i_exptime = 1
+        u_exptime = 30
     elif mag > 5:
         ifu_exptime = 90
         r_exptime = 10
         g_exptime = 10
         i_exptime = 10
         u_exptime = 60
-    elif mag > 0:
-        ifu_exptime = 60
-        r_exptime = 1
-        g_exptime = 1
-        i_exptime = 1
-        u_exptime = 30
+    elif mag > 10:
+        ifu_exptime = 300
+        r_exptime = 30
+        g_exptime = 30
+        i_exptime = 30
+        u_exptime = 60
+    elif mag > 12:
+        ifu_exptime = 600
+        r_exptime = 60
+        g_exptime = 60
+        i_exptime = 60
+        u_exptime = 120
+    elif mag > 13:
+        ifu_exptime = 900
+        r_exptime = 90
+        g_exptime = 90
+        i_exptime = 90
+        u_exptime = 180
+    elif mag > 15:
+        ifu_exptime = 2700
+        r_exptime = 120
+        g_exptime = 120
+        i_exptime = 120
+        u_exptime = 300
+    if mag > 18:
+        ifu_exptime = 3600
+        r_exptime = 180
+        g_exptime = 180
+        i_exptime = 180
+        u_exptime = 300
     else: # why are we giving this much to mag <= 0?
         ifu_exptime = 1800
         r_exptime = 90

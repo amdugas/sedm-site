@@ -7,6 +7,7 @@
 {% endblock head %}
 
 {% block content %}
+    <h2>{{ sedm_dict.message }}</h2>
     {{ calendar_picker('content', name='obsdate') }}
     <div class="container">
         {{ sedm_dict.sci_data| safe}}
