@@ -1062,7 +1062,7 @@ def get_ifu_products(obsdir, user_id, obsdate="", show_finder=True,
 
             div_str += "</div>"
 
-        sedm_dict = {'sci_data': div_str, 'message': 'Results shown for {}'.format(obsdate)}
+        sedm_dict = {'sci_data': div_str, 'message': 'IFU data products for {}'.format(obsdate)}
     return sedm_dict
 
     
